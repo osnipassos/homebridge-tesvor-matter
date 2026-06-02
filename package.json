@@ -41,6 +41,11 @@
   "peerDependencies": {
     "homebridge": ">=2.0.0"
   },
+  "peerDependenciesMeta": {
+    "homebridge": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "got": "^11.8.5",
     "ws": "^7.5.9"
