@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="homebridge-tesvor-matter.png" height="200px">
+  <img src="homebridge-tesvor.png" height="200px">
 </p>
 
-# Homebridge Tesvor
+# Homebridge Tesvor Matter
 
 [![npm](https://img.shields.io/npm/v/homebridge-tesvor-matter?style=flat-square)](https://www.npmjs.com/package/homebridge-tesvor-matter)
 [![Downloads](https://img.shields.io/npm/dt/homebridge-tesvor-matter)](https://www.npmjs.com/package/homebridge-tesvor-matter)
@@ -29,12 +29,18 @@ O aspirador aparece com a categoria correta de **Robot Vacuum Cleaner** no app C
 
 ## Instalação
 
-Via Homebridge UI (recomendado): pesquise por `homebridge-tesvor-matter` na aba Plugins.
-
-Via terminal:
+### Via npm (após publicação)
 
 ```bash
 sudo npm install -g homebridge-tesvor-matter
+```
+
+### Via GitHub (disponível agora)
+
+```bash
+sudo env PATH=/opt/homebridge/bin:$PATH /opt/homebridge/bin/npm install \
+  --prefix /var/lib/homebridge \
+  github:osnipassos/homebridge-tesvor-matter
 ```
 
 ## Configuração
@@ -80,16 +86,17 @@ Adicione ao `config.json` do Homebridge ou use a interface gráfica:
 
 ## Comunicação com o dispositivo
 
-O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conexão WebSocket persistente para receber atualizações de estado em tempo real. Comandos são enviados via AWS IoT MQTT shadow.
+O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conexão WebSocket persistente com ping de keepalive a cada 30 segundos para receber atualizações de estado em tempo real. Comandos são enviados via WebSocket para o backend WeBack, que os roteia internamente para o dispositivo.
 
 ## Roadmap
 
 - [ ] Suporte a múltiplos modos de limpeza como modos distintos no Matter (RvcCleanMode)
 - [ ] Mapeamento de erros do dispositivo para `operationalError`
+- [ ] Publicação no npm registry
 
 ## Créditos
 
-Fork de [marcelkordek/homebridge-tesvor-matter](https://github.com/marcelkordek/homebridge-tesvor-matter), reescrito para Homebridge 2.0 + Matter por [osnipassos](https://github.com/osnipassos).
+Fork de [marcelkordek/homebridge-tesvor](https://github.com/marcelkordek/homebridge-tesvor), reescrito para Homebridge 2.0 + Matter por [osnipassos](https://github.com/osnipassos).
 
 ## Licença
 
