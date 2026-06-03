@@ -107,5 +107,9 @@ export class TesvorPlatform implements DynamicPlatformPlugin {
       const matterAccessory = vacuum.buildMatterAccessory();
       await this.api.matter!.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [matterAccessory]);
     }
+
+    // Força push do estado atual 2s após o registro para garantir que o Apple Home
+    // receba uma confirmação de estado e saia do "Atualizando...".
+    setTimeout(() => vacuum.pushCurrentState(), 2000);
   }
 }

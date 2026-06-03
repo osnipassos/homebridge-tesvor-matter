@@ -126,6 +126,21 @@ export class TesvorVacuumAccessory {
           batChargeState: isCharging(this.currentStatus) ? BAT_IS_CHARGING : BAT_NOT_CHARGING,
         },
       },
+      getState: (cluster: string, attribute: string): unknown => {
+        const { operationalState, runMode, errorId } = this.mapStatus(this.currentStatus);
+        if (cluster === 'rvcRunMode' && attribute === 'currentMode') return runMode;
+        if (cluster === 'rvcCleanMode' && attribute === 'currentMode') return this.currentCleanMode;
+        if (cluster === 'rvcOperationalState') {
+          if (attribute === 'operationalState') return operationalState;
+          if (attribute === 'operationalError') return { errorStateId: errorId };
+        }
+        if (cluster === 'powerSource') {
+          if (attribute === 'batPercentRemaining') return this.currentBattery * 2;
+          if (attribute === 'batChargeLevel') return this.currentBattery < 20 ? 1 : 0;
+          if (attribute === 'batChargeState') return isCharging(this.currentStatus) ? BAT_IS_CHARGING : BAT_NOT_CHARGING;
+        }
+        return undefined;
+      },
       handlers: {
         rvcRunMode: {
           changeToMode: async (args: { newMode: number }) => {
@@ -167,6 +182,22 @@ export class TesvorVacuumAccessory {
         },
       },
     };
+  }
+
+  pushCurrentState(): void {
+    const { operationalState, runMode, errorId } = this.mapStatus(this.currentStatus);
+    void this.api.matter?.updateAccessoryState(this.uuid, 'rvcRunMode', { currentMode: runMode });
+    void this.api.matter?.updateAccessoryState(this.uuid, 'rvcCleanMode', { currentMode: this.currentCleanMode });
+    void this.api.matter?.updateAccessoryState(this.uuid, 'rvcOperationalState', {
+      operationalState,
+      operationalError: { errorStateId: errorId },
+    });
+    void this.api.matter?.updateAccessoryState(this.uuid, 'powerSource', {
+      batPercentRemaining: this.currentBattery * 2,
+      batChargeLevel: this.currentBattery < 20 ? 1 : 0,
+      batChargeState: isCharging(this.currentStatus) ? BAT_IS_CHARGING : BAT_NOT_CHARGING,
+    });
+    this.log.debug(`[${this.device.thing_nickname}] pushCurrentState: status=${this.currentStatus} bat=${this.currentBattery}%`);
   }
 
   private handleNotification(obj: Record<string, unknown>): void {
