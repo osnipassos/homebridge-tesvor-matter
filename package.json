@@ -1,6 +1,6 @@
 {
-  "displayName": "Homebridge Tesvor",
-  "name": "homebridge-tesvor",
+  "displayName": "Homebridge Tesvor Matter",
+  "name": "homebridge-tesvor-matter",
   "version": "2.0.0-alpha.1",
   "author": {
     "name": "osnipassos",
@@ -10,12 +10,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/osnipassos/homebridge-tesvor.git"
+    "url": "git://github.com/osnipassos/homebridge-tesvor-matter.git"
   },
   "bugs": {
-    "url": "https://github.com/osnipassos/homebridge-tesvor/issues"
+    "url": "https://github.com/osnipassos/homebridge-tesvor-matter/issues"
   },
-  "homepage": "https://github.com/osnipassos/homebridge-tesvor#readme",
+  "homepage": "https://github.com/osnipassos/homebridge-tesvor-matter#readme",
   "engines": {
     "node": ">=18.20.4",
     "homebridge": ">=2.0.0"

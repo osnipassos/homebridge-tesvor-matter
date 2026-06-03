@@ -1,5 +1,5 @@
-export const PLATFORM_NAME = 'HomebridgeTesvor';
-export const PLUGIN_NAME = 'homebridge-tesvor';
+export const PLATFORM_NAME = 'HomebridgeTesvorMatter';
+export const PLUGIN_NAME = 'homebridge-tesvor-matter';
 
 export const CLEANING_STATES = [
   'AutoClean', 'EdgeClean', 'SpotClean', 'RoomClean', 'SmartClean', 'MopClean',

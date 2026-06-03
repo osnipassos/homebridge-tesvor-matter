@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="homebridge-tesvor.png" height="200px">
+  <img src="homebridge-tesvor-matter.png" height="200px">
 </p>
 
 # Homebridge Tesvor
 
-[![npm](https://img.shields.io/npm/v/homebridge-tesvor?style=flat-square)](https://www.npmjs.com/package/homebridge-tesvor)
-[![Downloads](https://img.shields.io/npm/dt/homebridge-tesvor)](https://www.npmjs.com/package/homebridge-tesvor)
-[![GitHub last commit](https://img.shields.io/github/last-commit/osnipassos/homebridge-tesvor?style=flat-square)](https://github.com/osnipassos/homebridge-tesvor)
+[![npm](https://img.shields.io/npm/v/homebridge-tesvor-matter?style=flat-square)](https://www.npmjs.com/package/homebridge-tesvor-matter)
+[![Downloads](https://img.shields.io/npm/dt/homebridge-tesvor-matter)](https://www.npmjs.com/package/homebridge-tesvor-matter)
+[![GitHub last commit](https://img.shields.io/github/last-commit/osnipassos/homebridge-tesvor-matter?style=flat-square)](https://github.com/osnipassos/homebridge-tesvor-matter)
 
 Plugin para [Homebridge 2.0](https://homebridge.io) que expõe aspiradores robô **Tesvor / WeBack** como dispositivos **Matter nativos** no Apple Home (iOS 18+).
 
@@ -29,12 +29,12 @@ O aspirador aparece com a categoria correta de **Robot Vacuum Cleaner** no app C
 
 ## Instalação
 
-Via Homebridge UI (recomendado): pesquise por `homebridge-tesvor` na aba Plugins.
+Via Homebridge UI (recomendado): pesquise por `homebridge-tesvor-matter` na aba Plugins.
 
 Via terminal:
 
 ```bash
-sudo npm install -g homebridge-tesvor
+sudo npm install -g homebridge-tesvor-matter
 ```
 
 ## Configuração
@@ -45,7 +45,7 @@ Adicione ao `config.json` do Homebridge ou use a interface gráfica:
 {
   "platforms": [
     {
-      "platform": "HomebridgeTesvor",
+      "platform": "HomebridgeTesvorMatter",
       "username": "seu@email.com",
       "password": "sua-senha",
       "country": "0055",
@@ -89,7 +89,7 @@ O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conex
 
 ## Créditos
 
-Fork de [marcelkordek/homebridge-tesvor](https://github.com/marcelkordek/homebridge-tesvor), reescrito para Homebridge 2.0 + Matter por [osnipassos](https://github.com/osnipassos).
+Fork de [marcelkordek/homebridge-tesvor-matter](https://github.com/marcelkordek/homebridge-tesvor-matter), reescrito para Homebridge 2.0 + Matter por [osnipassos](https://github.com/osnipassos).
 
 ## Licença
 

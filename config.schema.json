@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "HomebridgeTesvor",
+  "pluginAlias": "HomebridgeTesvorMatter",
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Plugin para aspiradores Tesvor/WeBack via Matter. Requer Homebridge 2.0 com Matter habilitado.",
