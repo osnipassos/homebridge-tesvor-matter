@@ -19,6 +19,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
+    "prepare": "npm run build",
     "build": "rimraf ./dist && tsc",
     "watch": "npm run build && npm link && nodemon",
     "lint": "eslint src/**/*.ts --max-warnings=0",
