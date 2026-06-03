@@ -8,28 +8,31 @@
 [![Downloads](https://img.shields.io/npm/dt/homebridge-tesvor-matter)](https://www.npmjs.com/package/homebridge-tesvor-matter)
 [![GitHub last commit](https://img.shields.io/github/last-commit/osnipassos/homebridge-tesvor-matter?style=flat-square)](https://github.com/osnipassos/homebridge-tesvor-matter)
 
-Plugin para [Homebridge 2.0](https://homebridge.io) que expõe aspiradores robô **Tesvor / WeBack** como dispositivos **Matter nativos** no Apple Home (iOS 18+).
+[Homebridge 2.0](https://homebridge.io) plugin that exposes **Tesvor / WeBack** robot vacuum cleaners as **native Matter accessories** in Apple Home (iOS 18+).
 
-O aspirador aparece com a categoria correta de **Robot Vacuum Cleaner** no app Casa, com suporte completo a:
+The vacuum cleaner appears with the correct **Robot Vacuum Cleaner** category in the Home app, with full support for:
 
-- Iniciar / pausar / retomar limpeza
-- Retornar à base (Go Home)
-- Estado de bateria em tempo real
-- Estados operacionais: limpando, buscando carregador, carregando, ancorado, parado
+- Start / pause / resume cleaning
+- Return to base (Go Home)
+- Real-time battery status
+- Operational states: cleaning, seeking charger, charging, docked, stopped
+- Multiple cleaning modes selectable from Apple Home
 
-## Requisitos
+## Requirements
 
-| Componente | Versão mínima |
+| Component | Minimum version |
 |---|---|
-| Homebridge | **2.0.0** com Matter habilitado |
-| Node.js | **18.20.4** (recomendado: 20.x LTS) |
-| iOS / macOS | 18+ (para interface nativa de aspirador) |
+| Homebridge | **2.0.0** with Matter enabled |
+| Node.js | **18.20.4** (recommended: 20.x LTS) |
+| iOS / macOS | 18+ (for native robot vacuum interface) |
 
-> **Matter deve estar habilitado** nas configurações do Homebridge. Acesse *Homebridge UI → Configurações → Matter* e ative a opção.
+> **Matter must be enabled** in your Homebridge settings. Go to *Homebridge UI → Settings → Matter* and enable it.
 
-## Instalação
+> **Tip:** Set `bridge.bind` in your Homebridge settings to the Homebridge IP address (e.g. `10.0.0.x`). This ensures mDNS advertises the correct address to Home Hubs like HomePod and Apple TV, preventing "No Response" issues on iPhone.
 
-Via Homebridge UI (recomendado): pesquise por `homebridge-tesvor-matter` na aba Plugins.
+## Installation
+
+Via Homebridge UI (recommended): search for `homebridge-tesvor-matter` in the Plugins tab.
 
 Via terminal:
 
@@ -37,18 +40,18 @@ Via terminal:
 hb-service add homebridge-tesvor-matter
 ```
 
-## Configuração
+## Configuration
 
-Adicione ao `config.json` do Homebridge ou use a interface gráfica:
+Add to your Homebridge `config.json` or use the UI settings:
 
 ```json
 {
   "platforms": [
     {
       "platform": "HomebridgeTesvorMatter",
-      "username": "seu@email.com",
-      "password": "sua-senha",
-      "country": "0055",
+      "username": "your@email.com",
+      "password": "your-password",
+      "country": "0049",
       "startMode": "AutoClean",
       "stopMode": "BackCharging",
       "fanMode": "Normal",
@@ -58,41 +61,45 @@ Adicione ao `config.json` do Homebridge ou use a interface gráfica:
 }
 ```
 
-### Parâmetros
+### Parameters
 
-| Campo | Obrigatório | Descrição |
+| Field | Required | Description |
 |---|---|---|
-| `username` | Sim | E-mail ou telefone da conta WeBack (telefone sem código do país) |
-| `password` | Sim | Senha da conta WeBack |
-| `country` | Sim | Código do país — Brasil: `0055`, Alemanha: `0049` |
-| `startMode` | Sim | Modo de limpeza ao iniciar: `AutoClean`, `EdgeClean`, `SpotClean`, `RoomClean`, `SmartClean` |
-| `stopMode` | Sim | Ação ao parar: `BackCharging` (retorna à base) ou `Standby` (para no lugar) |
-| `fanMode` | Sim | Potência de sucção: `Normal` ou `Strong` |
-| `appName` | Sim | App original do dispositivo: `WeBack` ou `Redmond` |
+| `username` | Yes | WeBack account email or phone number (phone without country code) |
+| `password` | Yes | WeBack account password |
+| `country` | Yes | Country calling code — US: `0001`, UK: `0044`, Germany: `0049`, Brazil: `0055` |
+| `startMode` | Yes | Cleaning mode when started: `AutoClean`, `EdgeClean`, `SpotClean`, `RoomClean`, `SmartClean` |
+| `stopMode` | Yes | Action when stopped: `BackCharging` (return to base) or `Standby` (stop in place) |
+| `fanMode` | Yes | Suction power: `Normal` or `Strong` |
+| `appName` | Yes | Original device app: `WeBack` or `Redmond` |
 
-## Clusters Matter implementados
+## Matter Clusters
 
-| Cluster | Função |
+| Cluster | Function |
 |---|---|
-| `RvcRunMode` | Modos Idle / Cleaning |
+| `RvcRunMode` | Idle / Cleaning modes |
 | `RvcCleanMode` | Auto Clean, Edge Clean, Spot Clean, Room Clean, Smart Clean |
 | `RvcOperationalState` | Stopped / Running / Paused / Seeking Charger / Charging / Docked / Error |
-| `PowerSource` | Percentual de bateria, nível de carga, estado de carregamento |
+| `PowerSource` | Battery percentage, charge level, charging state |
 
-## Comunicação com o dispositivo
+## How it works
 
-O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conexão WebSocket persistente com ping de keepalive a cada 30 segundos para receber atualizações de estado em tempo real. Comandos são enviados via WebSocket para o backend WeBack, que os roteia internamente para o dispositivo.
+The plugin authenticates via the WeBack REST API (`grit-cloud.com`) and maintains a persistent WebSocket connection with 30-second keepalive pings for real-time state updates. Commands are sent via WebSocket to the WeBack backend, which routes them to the device.
 
-## Roadmap
+## Troubleshooting
 
-- [x] Suporte a múltiplos modos de limpeza via cluster `RvcCleanMode` (Auto, Edge, Spot, Room, Smart)
-- [x] Mapeamento de erros do dispositivo para `operationalError`
-- [x] Publicação no npm registry
+**"No Response" on iPhone while Mac works**
 
-## Créditos
+This typically happens when a Home Hub (HomePod or Apple TV) acts as a proxy and can't reach the Homebridge device. Fix: in Homebridge UI → Settings → Homebridge → set **Network Interface** to your Homebridge IP address. This ensures mDNS advertises the correct address.
 
-Fork de [marcelkordek/homebridge-tesvor](https://github.com/marcelkordek/homebridge-tesvor), reescrito para Homebridge 2.0 + Matter por [osnipassos](https://github.com/osnipassos).
+**"Updating..." never resolves**
 
-## Licença
+Remove the Aécio accessory from Apple Home and re-add it using the pairing code shown in the Homebridge logs.
+
+## Credits
+
+Forked from [marcelkordek/homebridge-tesvor](https://github.com/marcelkordek/homebridge-tesvor), rewritten for Homebridge 2.0 + Matter by [osnipassos](https://github.com/osnipassos).
+
+## License
 
 Apache-2.0
