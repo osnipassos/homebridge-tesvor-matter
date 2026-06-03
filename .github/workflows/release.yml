@@ -1,15 +1,15 @@
 name: Publish to npm
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [master]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for OIDC trusted publisher
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -24,5 +24,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check if version changed
+        id: version
+        run: |
+          LOCAL=$(node -p "require('./package.json').version")
+          PUBLISHED=$(npm view homebridge-tesvor-matter version 2>/dev/null || echo "0.0.0")
+          echo "local=$LOCAL"
+          echo "published=$PUBLISHED"
+          if [ "$LOCAL" != "$PUBLISHED" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish
+        if: steps.version.outputs.changed == 'true'
         run: npm publish --provenance --access public
