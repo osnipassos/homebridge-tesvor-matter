@@ -13,6 +13,9 @@ const MODE_CLEANING = 1;
 const TAG_IDLE = 16384;
 const TAG_CLEANING = 16385;
 
+// RvcCleanMode namespace ModeTag values (Matter spec §7.3.7.2)
+const TAG_VACUUM = 16385;
+
 // RvcOperationalState IDs (Matter spec §7.4)
 const OP_STOPPED = 0;
 const OP_RUNNING = 1;
@@ -91,11 +94,11 @@ export class TesvorVacuumAccessory {
         },
         rvcCleanMode: {
           supportedModes: [
-            { label: 'Auto Clean', mode: 0, modeTags: [{ value: 0 }] },
-            { label: 'Edge Clean', mode: 1, modeTags: [{ value: 0 }] },
-            { label: 'Spot Clean', mode: 2, modeTags: [{ value: 0 }] },
-            { label: 'Room Clean', mode: 3, modeTags: [{ value: 0 }] },
-            { label: 'Smart Clean', mode: 4, modeTags: [{ value: 0 }] },
+            { label: 'Auto Clean', mode: 0, modeTags: [{ value: TAG_VACUUM }] },
+            { label: 'Edge Clean', mode: 1, modeTags: [{ value: TAG_VACUUM }] },
+            { label: 'Spot Clean', mode: 2, modeTags: [{ value: TAG_VACUUM }] },
+            { label: 'Room Clean', mode: 3, modeTags: [{ value: TAG_VACUUM }] },
+            { label: 'Smart Clean', mode: 4, modeTags: [{ value: TAG_VACUUM }] },
           ],
           currentMode: this.currentCleanMode,
         },

@@ -10,5 +10,5 @@ export const CHARGING_STATES = [
 ] as const;
 
 export const DOCKED_STATES = [
-  'Charging', 'PileCharging', 'DirCharging', 'Hibernating',
+  'Charging', 'PileCharging', 'DirCharging', 'Hibernating', 'ChargeDone',
 ] as const;

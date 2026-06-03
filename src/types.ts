@@ -10,7 +10,8 @@ export type VacuumWorkingStatus =
   | 'Charging'
   | 'PileCharging'
   | 'DirCharging'
-  | 'Hibernating';
+  | 'Hibernating'
+  | 'ChargeDone';
 
 export type FanMode = 'Normal' | 'Strong';
 export type StartMode = 'AutoClean' | 'EdgeClean' | 'SpotClean' | 'RoomClean' | 'SmartClean';
