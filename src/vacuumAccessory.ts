@@ -5,7 +5,7 @@ import { TesvorConfig, WebackDevice, VacuumWorkingStatus } from './types';
 import { WsMonitor } from './lib/WsMonitor';
 import { isCleaning, isCharging, isDocked } from './lib/vacuum';
 
-// RvcRunMode mode IDs — must match the supportedModes list below
+// RvcRunMode mode IDs
 const MODE_IDLE = 0;
 const MODE_CLEANING = 1;
 
@@ -16,14 +16,21 @@ const TAG_CLEANING = 16385;
 // RvcOperationalState IDs (Matter spec §7.4)
 const OP_STOPPED = 0;
 const OP_RUNNING = 1;
+const OP_ERROR = 3;
 const OP_SEEKING_CHARGER = 64;
 const OP_CHARGING = 65;
 const OP_DOCKED = 66;
 
+// RvcOperationalState ErrorState IDs (Matter spec §7.4.7)
+const ERR_NONE = 0;
+const ERR_UNABLE_TO_COMPLETE = 2;
+
 // PowerSource BatChargeState values
-const BAT_CHARGE_UNKNOWN = 0;
 const BAT_IS_CHARGING = 1;
 const BAT_NOT_CHARGING = 3;
+
+// RvcCleanMode mode IDs — index = mode number sent to Matter
+const CLEAN_MODES = ['AutoClean', 'EdgeClean', 'SpotClean', 'RoomClean', 'SmartClean'] as const;
 
 export interface MatterAccessoryContext {
   device: WebackDevice;
@@ -34,6 +41,7 @@ export class TesvorVacuumAccessory {
 
   private currentStatus: VacuumWorkingStatus;
   private currentBattery: number;
+  private currentCleanMode: number;
 
   constructor(
     private readonly log: Logger,
@@ -45,6 +53,10 @@ export class TesvorVacuumAccessory {
     this.uuid = this.api.hap.uuid.generate(device.thing_name);
     this.currentStatus = device.thing_status.working_status;
     this.currentBattery = device.thing_status.battery_level ?? 0;
+    this.currentCleanMode = Math.max(
+      0,
+      CLEAN_MODES.indexOf(config.startMode as typeof CLEAN_MODES[number]),
+    );
 
     ws.on('notification', (obj: Record<string, unknown>) => {
       this.handleNotification(obj);
@@ -52,7 +64,7 @@ export class TesvorVacuumAccessory {
   }
 
   buildMatterAccessory(): MatterAccessory<MatterAccessoryContext> {
-    const { operationalState, runMode } = this.mapStatus(this.currentStatus);
+    const { operationalState, runMode, errorId } = this.mapStatus(this.currentStatus);
 
     return {
       UUID: this.uuid,
@@ -71,6 +83,16 @@ export class TesvorVacuumAccessory {
           ],
           currentMode: runMode,
         },
+        rvcCleanMode: {
+          supportedModes: [
+            { label: 'Auto Clean', mode: 0, modeTags: [{ value: 0 }] },
+            { label: 'Edge Clean', mode: 1, modeTags: [{ value: 0 }] },
+            { label: 'Spot Clean', mode: 2, modeTags: [{ value: 0 }] },
+            { label: 'Room Clean', mode: 3, modeTags: [{ value: 0 }] },
+            { label: 'Smart Clean', mode: 4, modeTags: [{ value: 0 }] },
+          ],
+          currentMode: this.currentCleanMode,
+        },
         rvcOperationalState: {
           phaseList: null,
           currentPhase: null,
@@ -84,7 +106,7 @@ export class TesvorVacuumAccessory {
             { operationalStateId: 66 },
           ],
           operationalState,
-          operationalError: { errorStateId: 0 },
+          operationalError: { errorStateId: errorId },
         },
         powerSource: {
           status: 1,
@@ -99,11 +121,23 @@ export class TesvorVacuumAccessory {
         rvcRunMode: {
           changeToMode: async (args: { newMode: number }) => {
             if (args.newMode === MODE_CLEANING) {
-              this.log.info(`[${this.device.thing_nickname}] Iniciando limpeza: ${this.config.startMode}`);
-              this.sendCommand(this.config.startMode);
+              const cleanStatus = this.cleanModeToStatus(this.currentCleanMode);
+              this.log.info(`[${this.device.thing_nickname}] Iniciando limpeza: ${cleanStatus}`);
+              this.sendCommand(cleanStatus);
             } else {
               this.log.info(`[${this.device.thing_nickname}] Parando: ${this.config.stopMode}`);
               this.sendCommand(this.config.stopMode);
+            }
+          },
+        },
+        rvcCleanMode: {
+          changeToMode: async (args: { newMode: number }) => {
+            this.currentCleanMode = args.newMode;
+            const cleanStatus = this.cleanModeToStatus(args.newMode);
+            this.log.info(`[${this.device.thing_nickname}] Modo de limpeza selecionado: ${cleanStatus}`);
+            // Se o robô já estiver limpando, troca o modo imediatamente
+            if (isCleaning(this.currentStatus)) {
+              this.sendCommand(cleanStatus);
             }
           },
         },
@@ -113,8 +147,9 @@ export class TesvorVacuumAccessory {
             this.sendCommand('Standby');
           },
           resume: async () => {
-            this.log.info(`[${this.device.thing_nickname}] Retomando limpeza`);
-            this.sendCommand(this.config.startMode);
+            const cleanStatus = this.cleanModeToStatus(this.currentCleanMode);
+            this.log.info(`[${this.device.thing_nickname}] Retomando limpeza: ${cleanStatus}`);
+            this.sendCommand(cleanStatus);
           },
           goHome: async () => {
             this.log.info(`[${this.device.thing_nickname}] Retornando à base`);
@@ -150,7 +185,7 @@ export class TesvorVacuumAccessory {
 
     if (!changed) return;
 
-    const { operationalState, runMode } = this.mapStatus(this.currentStatus);
+    const { operationalState, runMode, errorId } = this.mapStatus(this.currentStatus);
 
     void this.api.matter?.updateAccessoryState(this.uuid, 'rvcRunMode', {
       currentMode: runMode,
@@ -158,7 +193,7 @@ export class TesvorVacuumAccessory {
 
     void this.api.matter?.updateAccessoryState(this.uuid, 'rvcOperationalState', {
       operationalState,
-      operationalError: { errorStateId: 0 },
+      operationalError: { errorStateId: errorId },
     });
 
     void this.api.matter?.updateAccessoryState(this.uuid, 'powerSource', {
@@ -168,7 +203,7 @@ export class TesvorVacuumAccessory {
     });
 
     this.log.debug(
-      `[${this.device.thing_nickname}] status=${this.currentStatus} bat=${this.currentBattery}% opState=${operationalState} runMode=${runMode}`,
+      `[${this.device.thing_nickname}] status=${this.currentStatus} bat=${this.currentBattery}% opState=${operationalState} errId=${errorId} runMode=${runMode} cleanMode=${this.currentCleanMode}`,
     );
   }
 
@@ -182,19 +217,28 @@ export class TesvorVacuumAccessory {
     });
   }
 
-  private mapStatus(status: VacuumWorkingStatus): { operationalState: number; runMode: number } {
-    if (isCleaning(status)) {
-      return { operationalState: OP_RUNNING, runMode: MODE_CLEANING };
+  private cleanModeToStatus(mode: number): string {
+    return CLEAN_MODES[mode] ?? this.config.startMode;
+  }
+
+  private mapStatus(status: VacuumWorkingStatus | string): { operationalState: number; runMode: number; errorId: number } {
+    if (isCleaning(status as VacuumWorkingStatus)) {
+      return { operationalState: OP_RUNNING, runMode: MODE_CLEANING, errorId: ERR_NONE };
     }
     if (status === 'BackCharging') {
-      return { operationalState: OP_SEEKING_CHARGER, runMode: MODE_IDLE };
+      return { operationalState: OP_SEEKING_CHARGER, runMode: MODE_IDLE, errorId: ERR_NONE };
     }
-    if (isCharging(status)) {
-      return { operationalState: OP_CHARGING, runMode: MODE_IDLE };
+    if (isCharging(status as VacuumWorkingStatus)) {
+      return { operationalState: OP_CHARGING, runMode: MODE_IDLE, errorId: ERR_NONE };
     }
-    if (isDocked(status)) {
-      return { operationalState: OP_DOCKED, runMode: MODE_IDLE };
+    if (isDocked(status as VacuumWorkingStatus)) {
+      return { operationalState: OP_DOCKED, runMode: MODE_IDLE, errorId: ERR_NONE };
     }
-    return { operationalState: OP_STOPPED, runMode: MODE_IDLE };
+    if (status === 'Standby') {
+      return { operationalState: OP_STOPPED, runMode: MODE_IDLE, errorId: ERR_NONE };
+    }
+    // Status desconhecido — reporta erro para o Apple Home
+    this.log.warn(`[${this.device.thing_nickname}] Status desconhecido recebido: "${status}"`);
+    return { operationalState: OP_ERROR, runMode: MODE_IDLE, errorId: ERR_UNABLE_TO_COMPLETE };
   }
 }

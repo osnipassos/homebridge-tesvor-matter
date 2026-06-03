@@ -90,8 +90,8 @@ O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conex
 
 ## Roadmap
 
-- [ ] Suporte a múltiplos modos de limpeza como modos distintos no Matter (RvcCleanMode)
-- [ ] Mapeamento de erros do dispositivo para `operationalError`
+- [x] Suporte a múltiplos modos de limpeza via cluster `RvcCleanMode` (Auto, Edge, Spot, Room, Smart)
+- [x] Mapeamento de erros do dispositivo para `operationalError`
 - [ ] Publicação no npm registry
 
 ## Créditos

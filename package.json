@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Tesvor Matter",
   "name": "homebridge-tesvor-matter",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0",
   "author": "osnipassos",
   "description": "Homebridge 2.0 Plugin for Tesvor/WeBack Robot Vacuum Cleaner",
   "license": "Apache-2.0",
@@ -18,6 +18,12 @@
     "homebridge": ">=2.0.0"
   },
   "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "config.schema.json",
+    "homebridge-tesvor.png",
+    "homebridge-tesvor.svg"
+  ],
   "scripts": {
     "prepare": "npm run build",
     "build": "rimraf ./dist && tsc",
