@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-06-03
+
+### Fixed
+
+- Re-autenticação forçada ao receber HTTP 403 no WebSocket WeBack
+- Backoff exponencial na reconexão: 15 → 30 → 60 → 120 → 300s (evita rate limiting)
+- Para automaticamente após 10 erros consecutivos com log de diagnóstico
+
+---
+
 ## [2.0.0] - 2026-06-02
 
 Complete rewrite by [osnipassos](https://github.com/osnipassos), forked from [marcelkordek/homebridge-tesvor](https://github.com/marcelkordek/homebridge-tesvor).
