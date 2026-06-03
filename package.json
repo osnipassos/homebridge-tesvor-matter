@@ -2,7 +2,10 @@
   "displayName": "Homebridge Tesvor",
   "name": "homebridge-tesvor",
   "version": "2.0.0-alpha.1",
-  "author": "osnipassos",
+  "author": {
+    "name": "osnipassos",
+    "url": "https://github.com/osnipassos"
+  },
   "description": "Homebridge 2.0 Plugin for Tesvor/WeBack Robot Vacuum Cleaner",
   "license": "Apache-2.0",
   "repository": {
