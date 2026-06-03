@@ -61,11 +61,11 @@ export class WsMonitor extends EventEmitter {
     }
 
     const webackData = await this.weback.getData();
-    const url = webackData.data.wss_url;
+    // A API retorna /prod/wss mas o endpoint ativo é /wss (sem /prod)
+    const url = webackData.data.wss_url.replace('/prod/wss', '/wss');
 
     this.ws = new WebSocket(url, undefined, {
       headers: {
-        Authorization: 'Basic KG51bGwpOihudWxsKQ==',
         region: webackData.data.region_name,
         token: webackData.data.jwt_token,
         Connection: 'keep-alive, Upgrade',
