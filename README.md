@@ -29,18 +29,12 @@ O aspirador aparece com a categoria correta de **Robot Vacuum Cleaner** no app C
 
 ## Instalação
 
-### Via npm (após publicação)
+Via Homebridge UI (recomendado): pesquise por `homebridge-tesvor-matter` na aba Plugins.
+
+Via terminal:
 
 ```bash
-sudo npm install -g homebridge-tesvor-matter
-```
-
-### Via GitHub (disponível agora)
-
-```bash
-sudo env PATH=/opt/homebridge/bin:$PATH /opt/homebridge/bin/npm install \
-  --prefix /var/lib/homebridge \
-  github:osnipassos/homebridge-tesvor-matter
+hb-service add homebridge-tesvor-matter
 ```
 
 ## Configuração
@@ -81,7 +75,8 @@ Adicione ao `config.json` do Homebridge ou use a interface gráfica:
 | Cluster | Função |
 |---|---|
 | `RvcRunMode` | Modos Idle / Cleaning |
-| `RvcOperationalState` | Stopped / Running / Paused / Seeking Charger / Charging / Docked |
+| `RvcCleanMode` | Auto Clean, Edge Clean, Spot Clean, Room Clean, Smart Clean |
+| `RvcOperationalState` | Stopped / Running / Paused / Seeking Charger / Charging / Docked / Error |
 | `PowerSource` | Percentual de bateria, nível de carga, estado de carregamento |
 
 ## Comunicação com o dispositivo
@@ -92,7 +87,7 @@ O plugin autentica via API REST da WeBack (`grit-cloud.com`) e mantém uma conex
 
 - [x] Suporte a múltiplos modos de limpeza via cluster `RvcCleanMode` (Auto, Edge, Spot, Room, Smart)
 - [x] Mapeamento de erros do dispositivo para `operationalError`
-- [ ] Publicação no npm registry
+- [x] Publicação no npm registry
 
 ## Créditos
 
