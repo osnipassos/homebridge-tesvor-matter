@@ -15,6 +15,7 @@ export class WsMonitor extends EventEmitter {
 
   private ws?: WebSocket;
   private timeout?: ReturnType<typeof setTimeout>;
+  private keepAlive?: ReturnType<typeof setInterval>;
 
   constructor(log: Logger, weback: Weback, params: WsMonitorOptions = {}) {
     super();
@@ -61,12 +62,19 @@ export class WsMonitor extends EventEmitter {
       .on('open', () => {
         this.ws!.ping();
         this.emit('listening', url);
+        this.keepAlive = setInterval(() => {
+          if (this.ws?.readyState === WebSocket.OPEN) {
+            this.ws.ping();
+          }
+        }, 30 * 1000);
       })
       .on('ping', (data: Buffer) => {
         this.log.debug('ping', data.toString());
       })
       .on('pong', (data: Buffer) => {
         this.log.debug('pong', data.toString());
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => void this.close(), 5 * 60 * 1000);
       })
       .on('message', (data: Buffer) => {
         clearTimeout(this.timeout);
@@ -76,9 +84,11 @@ export class WsMonitor extends EventEmitter {
         } catch (error) {
           this.emit('error', error);
         }
-        this.timeout = setTimeout(() => void this.close(), 60 * 1000);
+        this.timeout = setTimeout(() => void this.close(), 5 * 60 * 1000);
       })
       .on('close', () => {
+        clearInterval(this.keepAlive);
+        this.keepAlive = undefined;
         this.emit('closed', url);
         if (this.retryTime > 0) {
           setTimeout(() => void this.listen(), this.retryTime * 1000);
@@ -87,7 +97,9 @@ export class WsMonitor extends EventEmitter {
   }
 
   async close(): Promise<void> {
-    this.log.debug('no messages for 60s — closing WebSocket');
+    this.log.debug('WebSocket inativo por 5min — fechando');
+    clearInterval(this.keepAlive);
+    this.keepAlive = undefined;
     if (this.ws) {
       this.ws.close();
       await EventEmitter.once(this.ws, 'close');
