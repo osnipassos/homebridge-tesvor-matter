@@ -61,6 +61,12 @@ export class TesvorVacuumAccessory {
     ws.on('notification', (obj: Record<string, unknown>) => {
       this.handleNotification(obj);
     });
+
+    // Solicita o estado atual ao dispositivo quando o WebSocket conecta.
+    // Garante que o Apple Home receba um estado confirmado e saia do "Atualizando...".
+    ws.on('listening', () => {
+      ws.getUpdate(this.device);
+    });
   }
 
   buildMatterAccessory(): MatterAccessory<MatterAccessoryContext> {
