@@ -2,31 +2,33 @@
   "pluginAlias": "HomebridgeTesvorMatter",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Plugin para aspiradores Tesvor/WeBack via Matter. Requer Homebridge 2.0 com Matter habilitado.",
+  "headerDisplay": "Plugin for Tesvor/WeBack robot vacuums via Matter. Requires Homebridge 2.0 with Matter enabled, running as a child bridge.",
   "schema": {
     "type": "object",
     "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Homebridge Tesvor Matter"
+      },
       "username": {
         "title": "Username",
         "type": "string",
-        "required": true,
-        "description": "E-mail ou telefone da conta WeBack (telefone sem código do país, ex: 11912345678)"
+        "description": "WeBack account email or phone number (phone without country code, e.g. 11912345678)"
       },
       "password": {
         "title": "Password",
         "type": "string",
-        "required": true,
-        "description": "Senha da conta WeBack"
+        "description": "WeBack account password"
       },
       "country": {
         "title": "Country Code",
         "type": "string",
-        "required": true,
         "default": "0055",
-        "description": "Código do país (ex: 0055 para Brasil, 0049 para Alemanha)"
+        "description": "Country calling code (e.g. 0055 for Brazil, 0001 for US, 0044 for UK)"
       },
       "startMode": {
-        "title": "Modo de Limpeza",
+        "title": "Cleaning Mode",
         "type": "string",
         "default": "AutoClean",
         "oneOf": [
@@ -36,30 +38,27 @@
           { "title": "Room Clean", "enum": ["RoomClean"] },
           { "title": "Smart Clean", "enum": ["SmartClean"] }
         ],
-        "description": "Modo de limpeza acionado ao iniciar via Apple Home",
-        "required": true
+        "description": "Cleaning mode used when started from Apple Home"
       },
       "stopMode": {
-        "title": "Ação ao Parar",
+        "title": "Stop Action",
         "type": "string",
         "default": "BackCharging",
         "oneOf": [
-          { "title": "Retornar à base", "enum": ["BackCharging"] },
-          { "title": "Parar no lugar", "enum": ["Standby"] }
+          { "title": "Return to base", "enum": ["BackCharging"] },
+          { "title": "Stop in place", "enum": ["Standby"] }
         ],
-        "description": "O que o aspirador faz quando recebe o comando de parar",
-        "required": true
+        "description": "What the vacuum does when it receives a stop command"
       },
       "fanMode": {
-        "title": "Potência do Ventilador",
+        "title": "Fan Power",
         "type": "string",
         "default": "Normal",
         "oneOf": [
           { "title": "Normal", "enum": ["Normal"] },
-          { "title": "Forte", "enum": ["Strong"] }
+          { "title": "Strong", "enum": ["Strong"] }
         ],
-        "description": "Potência de sucção durante a limpeza",
-        "required": true
+        "description": "Suction power during cleaning"
       },
       "appName": {
         "title": "App",
@@ -69,9 +68,9 @@
           { "title": "WeBack", "enum": ["WeBack"] },
           { "title": "Redmond", "enum": ["Redmond"] }
         ],
-        "description": "App original do dispositivo",
-        "required": true
+        "description": "Original device app"
       }
-    }
+    },
+    "required": ["username", "password", "country", "startMode", "stopMode", "fanMode", "appName"]
   }
 }
